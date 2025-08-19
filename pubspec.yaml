@@ -1,6 +1,6 @@
 name: gertec_plus
 description: "Plugin for Gertec Plus devices, providing access to device features and functionalities."
-version: 0.0.2
+version: 0.1.0
 homepage:
 
 environment:
@@ -39,9 +39,7 @@ flutter:
         pluginClass: GertecPlusPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/to/asset-from-package

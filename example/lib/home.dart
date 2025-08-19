@@ -12,6 +12,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final api = GertecPlus();
 
+  // assets to preview/print
+  static const imgA = 'assets/a.jpg';
+  static const imgB = 'assets/b.jpg';
+
   bool _busy = false;
   String _platform = '—';
   String _sn = '—';
@@ -27,7 +31,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _textCtrl = TextEditingController(text: 'Olá, Gertec!');
     _barcodeCtrl = TextEditingController(text: 'TEXTO');
-    _loadInfo();
   }
 
   @override
@@ -160,20 +163,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Expanded(
-                        child: _Btn(
-                          icon: Icons.power_settings_new,
-                          label: 'Init',
-                          onTap: _busy
-                              ? null
-                              : () async {
-                            await _wrap(api.prnInit, ok: 'Init ok');
-                            final st = await _wrap(() => api.prnStatus());
-                            setState(() => _printerStatus = st ?? _printerStatus);
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
+
                       Expanded(
                         child: _Btn(
                           icon: Icons.stacked_bar_chart,
@@ -181,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                           onTap: _busy
                               ? null
                               : () async {
-                            final u = await _wrap(api.prnPaperUsage() as Future Function());
+                            final u = await _wrap(() => api.prnPaperUsage());
                             if (u != null) setState(() => _paperUsage = u);
                             _toast('Usage: ${u ?? '—'}');
                           },
@@ -235,14 +225,76 @@ class _HomePageState extends State<HomePage> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _Btn(icon: Icons.short_text, label: 'Print text',
-                          onTap: _busy ? null : () => _wrap(() => api.prnText(_textCtrl.text), ok: 'Text ok')),
-                      _Btn(icon: Icons.qr_code, label: 'Print code',
-                          onTap: _busy ? null : () => _wrap(() => api.prnBarcode(_barcodeType, _barcodeCtrl.text), ok: 'Code ok')),
-                      _Btn(icon: Icons.forward_to_inbox, label: 'Output',
-                          onTap: _busy ? null : () => _wrap(api.prnOutput, ok: 'Output ok')),
-                      _Btn(icon: Icons.image, label: 'Image',
-                          onTap: _busy ? null : () => _wrap(api.prnImage, ok: 'Image ok')),
+                      _Btn(
+                        icon: Icons.short_text,
+                        label: 'Print text',
+                        onTap: _busy
+                            ? null
+                            : () => _wrap(() => api.prnText(_textCtrl.text), ok: 'Text ok'),
+                      ),
+                      _Btn(
+                        icon: Icons.qr_code,
+                        label: 'Print code',
+                        onTap: _busy
+                            ? null
+                            : () => _wrap(
+                              () => api.prnBarcode(_barcodeType, _barcodeCtrl.text),
+                          ok: 'Code ok',
+                        ),
+                      ),
+                      _Btn(
+                        icon: Icons.forward_to_inbox,
+                        label: 'Output',
+                        onTap: _busy ? null : () => _wrap(api.prnOutput, ok: 'Output ok'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // New image preview + print
+            _Section(
+              title: 'Images',
+              subtitle: 'Preview and print assets',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: Image.asset(imgA, height: 80, fit: BoxFit.contain)),
+                      const SizedBox(width: 12),
+                      Expanded(child: Image.asset(imgB, height: 80, fit: BoxFit.contain)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _Btn(
+                          icon: Icons.print,
+                          label: 'Print A',
+                          onTap: _busy
+                              ? null
+                              : () => _wrap(
+                                () => api.prnImageAsset(imgA, maxWidth: 384, align: 'CENTER'),
+                            ok: 'Image A ok',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _Btn(
+                          icon: Icons.print,
+                          label: 'Print B',
+                          onTap: _busy
+                              ? null
+                              : () => _wrap(
+                                () => api.prnImageAsset(imgB, maxWidth: 384, align: 'CENTER'),
+                            ok: 'Image B ok',
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'gertec_plus_platform_interface.dart';
+import 'dart:typed_data';
 
 class MethodChannelGertecPlus extends GertecPlusPlatform {
   @visibleForTesting
@@ -32,8 +33,6 @@ class MethodChannelGertecPlus extends GertecPlusPlatform {
 
   // Printer
   @override
-  Future<void> prnInit() => _ch.invokeMethod('prn.init');
-  @override
   Future<String?> prnStatus() => _ch.invokeMethod<String>('prn.status');
   @override
   Future<int?> prnPaperUsage() => _ch.invokeMethod<int>('prn.paperUsage');
@@ -46,7 +45,6 @@ class MethodChannelGertecPlus extends GertecPlusPlatform {
       _ch.invokeMethod('prn.barcode', {'type': type, 'data': data});
   @override
   Future<void> prnOutput() => _ch.invokeMethod('prn.output');
-  // Remova prnImage(), não há handler nativo.
 
   // Contactless
   @override
@@ -66,6 +64,58 @@ class MethodChannelGertecPlus extends GertecPlusPlatform {
       _ch.invokeMethod<String>('smart.status', {'slot': slot});
   Future<void> smartPowerOff({String slot = 'USER'}) =>
       _ch.invokeMethod('smart.powerOff', {'slot': slot});
+  // Image printing
+  @override
+  Future<void> prnImageBytes(
+      Uint8List bytes, {
+        int maxWidth = 384,
+        String align = 'CENTER',
+      }) =>
+      _ch.invokeMethod('prn.image', {
+        'source': 'bytes',
+        'bytes': bytes,
+        'maxWidth': maxWidth,
+        'align': align,
+      });
+
+  @override
+  Future<void> prnImageAsset(
+      String assetPath, {
+        int maxWidth = 384,
+        String align = 'CENTER',
+      }) =>
+      _ch.invokeMethod('prn.image', {
+        'source': 'asset',
+        'asset': assetPath,
+        'maxWidth': maxWidth,
+        'align': align,
+      });
+
+  @override
+  Future<void> prnImageDrawable(
+      String drawableName, {
+        int maxWidth = 384,
+        String align = 'CENTER',
+      }) =>
+      _ch.invokeMethod('prn.image', {
+        'source': 'drawable',
+        'name': drawableName,
+        'maxWidth': maxWidth,
+        'align': align,
+      });
+
+  @override
+  Future<void> prnImageFile(
+      String path, {
+        int maxWidth = 384,
+        String align = 'CENTER',
+      }) =>
+      _ch.invokeMethod('prn.image', {
+        'source': 'file',
+        'path': path,
+        'maxWidth': maxWidth,
+        'align': align,
+      });
 
 
 }

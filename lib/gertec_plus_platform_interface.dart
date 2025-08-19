@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'gertec_plus_method_channel.dart';
+import 'dart:typed_data';
 
 abstract class GertecPlusPlatform extends PlatformInterface {
   GertecPlusPlatform() : super(token: _token);
@@ -26,13 +27,21 @@ abstract class GertecPlusPlatform extends PlatformInterface {
   Future<void> ledOff() => throw UnimplementedError('ledOff() not implemented.');
 
   // Printer
-  Future<void> prnInit() => throw UnimplementedError('prnInit() not implemented.');
   Future<String?> prnStatus() => throw UnimplementedError('prnStatus() not implemented.');
   Future<void> prnText(String text) => throw UnimplementedError('prnText() not implemented.');
   Future<void> prnBarcode(String type, String data) => throw UnimplementedError('prnBarcode() not implemented.');
-  Future<void> prnImage() => throw UnimplementedError('prnImage() not implemented.');
   Future<void> prnOutput() => throw UnimplementedError('prnOutput() not implemented.');
   Future<int?> prnPaperUsage() => throw UnimplementedError('prnPaperUsage() not implemented.');
+
+  // Image print contracts
+  Future<void> prnImageBytes(Uint8List bytes, {int maxWidth = 384, String align = 'CENTER'}) =>
+      throw UnimplementedError('prnImageBytes() not implemented.');
+  Future<void> prnImageAsset(String assetPath, {int maxWidth = 384, String align = 'CENTER'}) =>
+      throw UnimplementedError('prnImageAsset() not implemented.');
+  Future<void> prnImageDrawable(String drawableName, {int maxWidth = 384, String align = 'CENTER'}) =>
+      throw UnimplementedError('prnImageDrawable() not implemented.');
+  Future<void> prnImageFile(String path, {int maxWidth = 384, String align = 'CENTER'}) =>
+      throw UnimplementedError('prnImageFile() not implemented.');
 
   // Clock
   Future<Map?> clockGet() => throw UnimplementedError('clockGet() not implemented.');
