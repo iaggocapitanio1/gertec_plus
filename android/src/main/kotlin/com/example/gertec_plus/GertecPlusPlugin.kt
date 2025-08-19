@@ -38,25 +38,25 @@ class GertecPlusPlugin :
 
                 // INFO
                 "info.getSN" -> {
-                    val sn = GEDI.getInstance().iNFO.ControlNumberGet(GEDI_INFO_e_ControlNumber.SN)
+                    val sn = GEDI.getInstance().getINFO().ControlNumberGet(GEDI_INFO_e_ControlNumber.SN)
                     result.success(sn)
                 }
 
                 // PRINTER
-                "prn.init" -> { GEDI.getInstance().pRNTR.Init(); result.success(true) }
-                "prn.status" -> { result.success(GEDI.getInstance().pRNTR.Status().name) }
-                "prn.paperUsage" -> { result.success(GEDI.getInstance().pRNTR.GetPaperUsage()) }
-                "prn.resetPaper" -> { GEDI.getInstance().pRNTR.ResetPaperUsage(); result.success(true) }
+                "prn.init" -> { GEDI.getInstance().getPRNTR().Init(); result.success(true) }
+                "prn.status" -> { result.success(GEDI.getInstance().getPRNTR().Status().name) }
+                "prn.paperUsage" -> { result.success(GEDI.getInstance().getPRNTR().GetPaperUsage()) }
+                "prn.resetPaper" -> { GEDI.getInstance().getPRNTR().ResetPaperUsage(); result.success(true) }
                 "prn.text" -> {
                     val text = call.argument<String>("text") ?: ""
                     val paint = Paint().apply { textSize = 10f }
                     val cfg = GEDI_PRNTR_st_StringConfig().apply { lineSpace = 1; offset = 1; this.paint = paint }
-                    GEDI.getInstance().pRNTR.DrawStringExt(cfg, text)
+                    GEDI.getInstance().getPRNTR().DrawStringExt(cfg, text)
                     result.success(true)
                 }
                 "prn.blank" -> {
                     val h = call.argument<Int>("h") ?: 9
-                    GEDI.getInstance().pRNTR.DrawBlankLine(h)
+                    GEDI.getInstance().getPRNTR().DrawBlankLine(h)
                     result.success(true)
                 }
                 "prn.barcode" -> {
@@ -66,25 +66,25 @@ class GertecPlusPlugin :
                         barCodeType = type; height = if (type == GEDI_PRNTR_e_BarCodeType.QR_CODE) 100 else 100
                         width  = if (type == GEDI_PRNTR_e_BarCodeType.QR_CODE) 150 else 100
                     }
-                    GEDI.getInstance().pRNTR.DrawBarCode(cfg, data)
+                    GEDI.getInstance().getPRNTR().DrawBarCode(cfg, data)
                     result.success(true)
                 }
-                "prn.output" -> { GEDI.getInstance().pRNTR.Output(); result.success(true) }
+                "prn.output" -> { GEDI.getInstance().getPRNTR().Output(); result.success(true) }
 
                 // AUDIO
-                "audio.beep" -> { GEDI.getInstance().aUDIO.Beep(); result.success(true) }
+                "audio.beep" -> { GEDI.getInstance().getAUDIO().Beep(); result.success(true) }
 
                 // LED
                 "led.set" -> {
                     val id = GEDI_LED_e_Id.valueOf(call.argument<String>("id")!!)
                     val on = call.argument<Boolean>("on") ?: false
-                    GEDI.getInstance().lED.Set(id, on)
+                    GEDI.getInstance().getLED().Set(id, on)
                     result.success(true)
                 }
 
                 // CLOCK
                 "clock.rtc" -> {
-                    val rtc = GEDI.getInstance().cLOCK.RTCFGet()
+                    val rtc = GEDI.getInstance().getCLOCK().RTCFGet()
                     val m = mapOf(
                         "hour" to rtc.bHour.toInt(), "minute" to rtc.bMinute.toInt(), "second" to rtc.bSecond.toInt(),
                         "day" to rtc.bDay.toInt(), "month" to rtc.bMonth.toInt(), "year" to rtc.bYear.toInt(), "dow" to rtc.bDoW.toInt()
@@ -93,11 +93,11 @@ class GertecPlusPlugin :
                 }
 
                 // CONTACTLESS (CL) — básico
-                "cl.powerOn" -> { GEDI.getInstance().cL.PowerOn(); result.success(true) }
-                "cl.powerOff" -> { GEDI.getInstance().cL.PowerOff(); result.success(true) }
+                "cl.powerOn" -> { GEDI.getInstance().getCL().PowerOn(); result.success(true) }
+                "cl.powerOff" -> { GEDI.getInstance().getCL().PowerOff(); result.success(true) }
                 "cl.isoPolling" -> {
                     val timeoutMs = call.argument<Int>("timeoutMs") ?: 3000
-                    val info = GEDI.getInstance().cL.ISO_Polling(timeoutMs)
+                    val info = GEDI.getInstance().getCL().ISO_Polling(timeoutMs)
                     val uid = info.abUID.joinToString("") { String.format(Locale.US, "%02X", it) }
                     result.success(mapOf("type" to info.peType.name, "uidHex" to uid))
                 }
@@ -105,17 +105,17 @@ class GertecPlusPlugin :
                 // SMART — status e power off
                 "smart.status" -> {
                     val slot = GEDI_SMART_e_Slot.valueOf(call.argument<String>("slot")!!)
-                    result.success(GEDI.getInstance().sMART.Status(slot).name)
+                    result.success(GEDI.getInstance().getSMART().Status(slot).name)
                 }
                 "smart.powerOff" -> {
                     val slot = GEDI_SMART_e_Slot.valueOf(call.argument<String>("slot")!!)
-                    GEDI.getInstance().sMART.PowerOff(slot)
+                    GEDI.getInstance().getSMART().PowerOff(slot)
                     result.success(true)
                 }
 
                 // MSR — leitura simples
                 "msr.read" -> {
-                    val t = GEDI.getInstance().mSR.Read()
+                    val t = GEDI.getInstance().getMSR().Read()
                     fun bytesToHex(b: ByteArray?) = b?.joinToString("") { String.format("%02X", it) } ?: ""
                     result.success(mapOf(
                         "tk1" to bytesToHex(t.abTk1Buf),
@@ -126,7 +126,7 @@ class GertecPlusPlugin :
 
                 // DEMO equivalente ao seu btnIPRNTR
                 "prn.demo" -> {
-                    val p = GEDI.getInstance().pRNTR
+                    val p = GEDI.getInstance().getPRNTR()
                     val st = p.Status()
                     if (st != GEDI_PRNTR_e_Status.OK) { result.success("status=$st"); return }
                     p.Init()

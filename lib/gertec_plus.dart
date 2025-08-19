@@ -1,65 +1,38 @@
-import 'package:flutter/services.dart';
 import 'gertec_plus_platform_interface.dart';
 
-class MethodChannelGertecPlus extends GertecPlusPlatform {
-  final _ch = const MethodChannel('gertec_plus');
+class GertecPlus {
+  GertecPlusPlatform get _p => GertecPlusPlatform.instance;
 
-  // INFO
-  @override
-  Future<String> getSN() async => await _ch.invokeMethod('info.getSN');
+  // Device / Info
+  Future<String?> getPlatformVersion() => _p.getPlatformVersion();
+  Future<String?> infoSN() => _p.infoSN();
 
-  // PRINTER
-  @override
-  Future<void> prnInit() => _ch.invokeMethod('prn.init');
-  @override
-  Future<String> prnStatus() async => await _ch.invokeMethod('prn.status');
-  @override
-  Future<int?> prnPaperUsage() async => await _ch.invokeMethod('prn.paperUsage');
-  @override
-  Future<void> prnResetPaper() => _ch.invokeMethod('prn.resetPaper');
-  @override
-  Future<void> prnText(String text) => _ch.invokeMethod('prn.text', {'text': text});
-  @override
-  Future<void> prnBlank(int h) => _ch.invokeMethod('prn.blank', {'h': h});
-  @override
-  Future<void> prnBarcode(String type, String data) =>
-      _ch.invokeMethod('prn.barcode', {'type': type, 'data': data});
-  @override
-  Future<void> prnOutput() => _ch.invokeMethod('prn.output');
-  @override
-  Future<String> prnDemo() async => await _ch.invokeMethod('prn.demo');
-
-  // AUDIO
-  @override
-  Future<void> beep() => _ch.invokeMethod('audio.beep');
+  // Audio
+  Future<void> beep() => _p.beep();
 
   // LED
-  @override
-  Future<void> ledSet(String id, bool on) =>
-      _ch.invokeMethod('led.set', {'id': id, 'on': on});
+  Future<void> ledOn() => _p.ledOn();
+  Future<void> ledOff() => _p.ledOff();
 
-  // CLOCK
-  @override
-  Future<Map?> clockRtc() async => await _ch.invokeMethod('clock.rtc');
+  // Printer
+  Future<void> prnInit() => _p.prnInit();
+  Future<String?> prnStatus() => _p.prnStatus();
+  Future<void> prnText(String text) => _p.prnText(text);
+  Future<void> prnBarcode(String type, String data) => _p.prnBarcode(type, data);
+  Future<void> prnImage() => _p.prnImage();
+  Future<void> prnOutput() => _p.prnOutput();
+  Future<int?> prnPaperUsage() => _p.prnPaperUsage();
 
-  // CL
-  @override
-  Future<void> clPowerOn() => _ch.invokeMethod('cl.powerOn');
-  @override
-  Future<void> clPowerOff() => _ch.invokeMethod('cl.powerOff');
-  @override
-  Future<Map?> clIsoPolling(int timeoutMs) async =>
-      await _ch.invokeMethod('cl.isoPolling', {'timeoutMs': timeoutMs});
+  // Clock
+  Future<Map?> clockGet() => _p.clockGet();
 
-  // SMART
-  @override
-  Future<String> smartStatus(String slot) async =>
-      await _ch.invokeMethod('smart.status', {'slot': slot});
-  @override
-  Future<void> smartPowerOff(String slot) =>
-      _ch.invokeMethod('smart.powerOff', {'slot': slot});
+  // Contactless
+  Future<void> clPowerOn() => _p.clPowerOn();
+  Future<void> clPowerOff() => _p.clPowerOff();
 
   // MSR
-  @override
-  Future<Map?> msrRead() async => await _ch.invokeMethod('msr.read');
+  Future<Map?> msrRead() => _p.msrRead();
+
+  // Smartcard
+  Future<String?> smartStatus() => _p.smartStatus();
 }

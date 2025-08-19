@@ -1,48 +1,49 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'gertec_plus_method_channel.dart';
 
 abstract class GertecPlusPlatform extends PlatformInterface {
   GertecPlusPlatform() : super(token: _token);
   static final Object _token = Object();
 
-  static GertecPlusPlatform _instance = throw UnimplementedError('Set instance');
+  static GertecPlusPlatform _instance = MethodChannelGertecPlus(); // default
   static GertecPlusPlatform get instance => _instance;
   static set instance(GertecPlusPlatform i) {
     PlatformInterface.verifyToken(i, _token);
     _instance = i;
   }
 
-  // INFO
-  Future<String> getSN();
+  // Device / Info
+  Future<String?> getPlatformVersion() =>
+      throw UnimplementedError('getPlatformVersion() not implemented.');
+  Future<String?> infoSN() =>
+      throw UnimplementedError('infoSN() not implemented.');
 
-  // PRINTER
-  Future<void> prnInit();
-  Future<String> prnStatus();
-  Future<int?> prnPaperUsage();
-  Future<void> prnResetPaper();
-  Future<void> prnText(String text);
-  Future<void> prnBlank(int h);
-  Future<void> prnBarcode(String type, String data);
-  Future<void> prnOutput();
-  Future<String> prnDemo();
-
-  // AUDIO
-  Future<void> beep();
+  // Audio
+  Future<void> beep() => throw UnimplementedError('beep() not implemented.');
 
   // LED
-  Future<void> ledSet(String id, bool on);
+  Future<void> ledOn() => throw UnimplementedError('ledOn() not implemented.');
+  Future<void> ledOff() => throw UnimplementedError('ledOff() not implemented.');
 
-  // CLOCK
-  Future<Map?> clockRtc();
+  // Printer
+  Future<void> prnInit() => throw UnimplementedError('prnInit() not implemented.');
+  Future<String?> prnStatus() => throw UnimplementedError('prnStatus() not implemented.');
+  Future<void> prnText(String text) => throw UnimplementedError('prnText() not implemented.');
+  Future<void> prnBarcode(String type, String data) => throw UnimplementedError('prnBarcode() not implemented.');
+  Future<void> prnImage() => throw UnimplementedError('prnImage() not implemented.');
+  Future<void> prnOutput() => throw UnimplementedError('prnOutput() not implemented.');
+  Future<int?> prnPaperUsage() => throw UnimplementedError('prnPaperUsage() not implemented.');
 
-  // CL
-  Future<void> clPowerOn();
-  Future<void> clPowerOff();
-  Future<Map?> clIsoPolling(int timeoutMs);
+  // Clock
+  Future<Map?> clockGet() => throw UnimplementedError('clockGet() not implemented.');
 
-  // SMART
-  Future<String> smartStatus(String slot);
-  Future<void> smartPowerOff(String slot);
+  // Contactless
+  Future<void> clPowerOn() => throw UnimplementedError('clPowerOn() not implemented.');
+  Future<void> clPowerOff() => throw UnimplementedError('clPowerOff() not implemented.');
 
   // MSR
-  Future<Map?> msrRead();
+  Future<Map?> msrRead() => throw UnimplementedError('msrRead() not implemented.');
+
+  // Smartcard
+  Future<String?> smartStatus() => throw UnimplementedError('smartStatus() not implemented.');
 }
