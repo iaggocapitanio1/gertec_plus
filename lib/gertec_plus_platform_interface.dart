@@ -1,58 +1,72 @@
+// lib/gertec_plus_platform_interface.dart
+import 'dart:typed_data';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'gertec_plus_method_channel.dart';
-import 'dart:typed_data';
 
 abstract class GertecPlusPlatform extends PlatformInterface {
   GertecPlusPlatform() : super(token: _token);
   static final Object _token = Object();
 
-  static GertecPlusPlatform _instance = MethodChannelGertecPlus(); // default
+  static GertecPlusPlatform _instance = MethodChannelGertecPlus();
   static GertecPlusPlatform get instance => _instance;
   static set instance(GertecPlusPlatform i) {
     PlatformInterface.verifyToken(i, _token);
     _instance = i;
   }
 
+  // Lifecycle
+  Future<void> warmup() => _unimpl('warmup');
+
   // Device / Info
-  Future<String?> getPlatformVersion() =>
-      throw UnimplementedError('getPlatformVersion() not implemented.');
-  Future<String?> infoSN() =>
-      throw UnimplementedError('infoSN() not implemented.');
+  Future<String?> getPlatformVersion() => _unimpl('getPlatformVersion');
+  Future<String?> infoSN() => _unimpl('infoSN');
 
   // Audio
-  Future<void> beep() => throw UnimplementedError('beep() not implemented.');
+  Future<void> beep() => _unimpl('beep');
 
   // LED
-  Future<void> ledOn() => throw UnimplementedError('ledOn() not implemented.');
-  Future<void> ledOff() => throw UnimplementedError('ledOff() not implemented.');
+  Future<void> ledSet(String id, bool on) => _unimpl('ledSet');
+  // Convenience
+  Future<void> ledOn() => _unimpl('ledOn');
+  Future<void> ledOff() => _unimpl('ledOff');
 
   // Printer
-  Future<String?> prnStatus() => throw UnimplementedError('prnStatus() not implemented.');
-  Future<void> prnText(String text) => throw UnimplementedError('prnText() not implemented.');
-  Future<void> prnBarcode(String type, String data) => throw UnimplementedError('prnBarcode() not implemented.');
-  Future<void> prnOutput() => throw UnimplementedError('prnOutput() not implemented.');
-  Future<int?> prnPaperUsage() => throw UnimplementedError('prnPaperUsage() not implemented.');
+  Future<String?> prnStatus() => _unimpl('prnStatus');
+  Future<void> prnText(String text) => _unimpl('prnText');
+  Future<void> prnBarcode(String type, String data) => _unimpl('prnBarcode');
+  Future<void> prnBlank(int h) => _unimpl('prnBlank');
+  Future<void> prnOutput() => _unimpl('prnOutput');
+  Future<int?> prnPaperUsage() => _unimpl('prnPaperUsage');
+  Future<void> prnResetPaper() => _unimpl('prnResetPaper');
 
-  // Image print contracts
+  // Images
   Future<void> prnImageBytes(Uint8List bytes, {int maxWidth = 384, String align = 'CENTER'}) =>
-      throw UnimplementedError('prnImageBytes() not implemented.');
+      _unimpl('prnImageBytes');
   Future<void> prnImageAsset(String assetPath, {int maxWidth = 384, String align = 'CENTER'}) =>
-      throw UnimplementedError('prnImageAsset() not implemented.');
+      _unimpl('prnImageAsset');
   Future<void> prnImageDrawable(String drawableName, {int maxWidth = 384, String align = 'CENTER'}) =>
-      throw UnimplementedError('prnImageDrawable() not implemented.');
+      _unimpl('prnImageDrawable');
   Future<void> prnImageFile(String path, {int maxWidth = 384, String align = 'CENTER'}) =>
-      throw UnimplementedError('prnImageFile() not implemented.');
+      _unimpl('prnImageFile');
 
   // Clock
-  Future<Map?> clockGet() => throw UnimplementedError('clockGet() not implemented.');
+  Future<Map<String, dynamic>?> clockGet() => _unimpl('clockGet');
 
   // Contactless
-  Future<void> clPowerOn() => throw UnimplementedError('clPowerOn() not implemented.');
-  Future<void> clPowerOff() => throw UnimplementedError('clPowerOff() not implemented.');
+  Future<void> clPowerOn() => _unimpl('clPowerOn');
+  Future<void> clPowerOff() => _unimpl('clPowerOff');
+  Future<Map<String, dynamic>?> clIsoPolling({int timeoutMs = 3000}) => _unimpl('clIsoPolling');
 
   // MSR
-  Future<Map?> msrRead() => throw UnimplementedError('msrRead() not implemented.');
+  Future<Map<String, dynamic>?> msrRead() => _unimpl('msrRead');
 
   // Smartcard
-  Future<String?> smartStatus() => throw UnimplementedError('smartStatus() not implemented.');
+  Future<String?> smartStatus({String slot = 'SLOT0'}) => _unimpl('smartStatus');
+  Future<void> smartPowerOff({String slot = 'SLOT0'}) => _unimpl('smartPowerOff');
+
+  // Demo
+  Future<String?> prnDemo() => _unimpl('prnDemo');
+
+  static Never _unimpl(String name) =>
+      throw UnimplementedError('$name() not implemented by the platform.');
 }

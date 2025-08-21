@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gertec_plus/gertec_plus.dart';
+import 'package:gertec_plus_example/utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,24 +27,11 @@ class _HomePageState extends State<HomePage> {
   late final TextEditingController _barcodeCtrl;
   String _barcodeType = 'QR_CODE';
 
-  @override
-  void initState() {
-    super.initState();
-    _textCtrl = TextEditingController(text: 'Olá, Gertec!');
-    _barcodeCtrl = TextEditingController(text: 'TEXTO');
-  }
-
-  @override
-  void dispose() {
-    _textCtrl.dispose();
-    _barcodeCtrl.dispose();
-    super.dispose();
-  }
 
   Future<T?> _wrap<T>(Future<T> Function() fn, {String? ok}) async {
     setState(() => _busy = true);
     try {
-      final r = await fn();
+      final r = await callNoBusy(fn);
       if (ok != null) _toast(ok);
       return r;
     } on PlatformException catch (e) {
@@ -56,6 +44,29 @@ class _HomePageState extends State<HomePage> {
     return null;
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    _textCtrl = TextEditingController(text: 'Olá, Gertec!');
+    _barcodeCtrl = TextEditingController(text: 'TEXTO');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      api.warmup(); // fire-and-forget, does not block UI
+      if (mounted) _loadInfo();
+    });
+  }
+
+
+  @override
+  void dispose() {
+    _textCtrl.dispose();
+    _barcodeCtrl.dispose();
+    super.dispose();
+  }
+
+
+
   void _toast(String msg) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -64,18 +75,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadInfo() async {
-    final v = await _wrap(() => api.getPlatformVersion());
-    final sn = await _wrap(() => api.infoSN());
-    final st = await _wrap(() => api.prnStatus());
-    final usage = await _wrap(() => api.prnPaperUsage());
-    if (!mounted) return;
-    setState(() {
-      _platform = v ?? '—';
-      _sn = sn ?? '—';
-      _printerStatus = st ?? '—';
-      _paperUsage = usage;
-    });
+    setState(() => _busy = true);
+    try {
+      final results = await Future.wait([
+        callNoBusy(() => api.getPlatformVersion()),
+        callNoBusy(() => api.infoSN()),
+        callNoBusy(() => api.prnStatus()),
+        callNoBusy(() => api.prnPaperUsage()),
+      ]);
+      if (!mounted) return;
+      setState(() {
+        _platform = (results[0] as String?) ?? '—';
+        _sn = (results[1] as String?) ?? '—';
+        _printerStatus = (results[2] as String?) ?? '—';
+        _paperUsage = results[3] as int?;
+      });
+    } on PlatformException catch (e) {
+      _toast('Fail: ${e.code}${e.message != null ? ' — ${e.message}' : ''}');
+    } catch (e) {
+      _toast('Error: $e');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {

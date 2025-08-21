@@ -1,10 +1,16 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
-
+val keystorePropsFile = rootProject.file("key.properties")
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.exists()) load(FileInputStream(keystorePropsFile))
+}
 android {
     namespace = "com.example.gertec_plus_example"
     compileSdk = flutter.compileSdkVersion
@@ -28,18 +34,29 @@ android {
         targetSdk = 30
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
     }
     lint {
         // opcional manter:
         checkReleaseBuilds = false
         abortOnError = false
     }
-
+    signingConfigs {
+        create("enhanced") {
+            storeFile = file(keystoreProps["storeFile"] as String)
+            storePassword = keystoreProps["storePassword"] as String
+            keyAlias = keystoreProps["keyAlias"] as String
+            keyPassword = keystoreProps["keyPassword"] as String
+        }
+    }
     buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+        getByName("release") {
+            signingConfig = signingConfigs.findByName("enhanced")
+                ?: signingConfigs.getByName("debug")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.findByName("enhanced")
+                ?: signingConfigs.getByName("debug")
         }
     }
 }
