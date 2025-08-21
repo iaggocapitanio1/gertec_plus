@@ -1,6 +1,6 @@
 name: gertec_plus
 description: "Plugin for Gertec Plus devices, providing access to device features and functionalities."
-version: 0.1.0
+version: 0.1.1
 homepage:
 
 environment:
